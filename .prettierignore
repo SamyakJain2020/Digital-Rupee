@@ -3,3 +3,10 @@ artifacts
 cache
 coverage*
 gasReporterOutput.json
+/test/
+/test-*
+/tests/
+/test-*.js
+/scripts/
+/scripts-*
+/scripts-*.js
