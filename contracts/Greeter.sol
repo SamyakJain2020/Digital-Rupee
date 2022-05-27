@@ -7,6 +7,7 @@ contract DCertify {
     struct VerifiedDocument {
         string document;
         address owner;
+        uint256 timestamp;
         string signature;
     }
     struct image {
@@ -17,27 +18,39 @@ contract DCertify {
     mapping(address => image) mfa;
 
     //get image name
-    function getImageName(address _address)
-        public
-        view
-        returns (string memory)
-    {
+    function login(address _address) public view returns (string memory) {
         return mfa[_address].name;
     }
 
-    function setImageName(address _address, string memory _name) public {
+    function register(
+        address _address,
+        string memory _name,
+        string memory isVerified
+    ) public {
+        require(msg.sender == _address);
+        require(
+            (keccak256(abi.encodePacked((isVerified))) ==
+                keccak256(abi.encodePacked(("True"))))
+        );
         mfa[_address].name = _name;
     }
 
     function addDocument(
         string memory _document,
         address _owner,
-        string memory _signature
+        string memory _signature,
+        string memory isVerified
     ) public {
+        require(msg.sender == _owner);
+        require(
+            (keccak256(abi.encodePacked((isVerified))) ==
+                keccak256(abi.encodePacked(("True"))))
+        );
         documents[msg.sender].push(
             VerifiedDocument({
                 document: _document,
                 owner: _owner,
+                timestamp: block.timestamp,
                 signature: _signature
             })
         );
@@ -103,7 +116,8 @@ contract DCertify {
 
         return ecrecover(message, v, r, s);
     }
-        function splitSignature(bytes memory sig)
+
+    function splitSignature(bytes memory sig)
         internal
         pure
         returns (
